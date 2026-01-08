@@ -5,7 +5,12 @@ import esphome.codegen as cg
 try:
     from esphome.config_helpers import filter_source_files_from_platform
 except Exception:  # pragma: no cover - fallback for older ESPHome builds
-    from esphome.const import KEY_CORE, KEY_TARGET_FRAMEWORK, KEY_TARGET_PLATFORM
+    from esphome.const import (
+        KEY_CORE,
+        KEY_TARGET_FRAMEWORK,
+        KEY_TARGET_PLATFORM,
+        PlatformFramework,
+    )
 
     _PLATFORM_FRAMEWORK_LOOKUP = {
         (pf.value[0].value, pf.value[1].value): pf for pf in PlatformFramework
