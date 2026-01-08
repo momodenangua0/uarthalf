@@ -34,7 +34,6 @@ from esphome.const import (
     CONF_TX_PIN,
     CONF_UART_ID,
     PLATFORM_HOST,
-    PlatformFramework,
 )
 from esphome.core import CORE
 import esphome.final_validate as fv
@@ -443,19 +442,24 @@ async def uart_write_to_code(config, action_id, template_arg, args):
     return var
 
 
-FILTER_SOURCE_FILES = filter_source_files_from_platform(
-    {
-        "uart_component_esp_idf.cpp": {
-            PlatformFramework.ESP32_IDF,
-            PlatformFramework.ESP32_ARDUINO,
-        },
-        "uart_component_esp8266.cpp": {PlatformFramework.ESP8266_ARDUINO},
-        "uart_component_host.cpp": {PlatformFramework.HOST_NATIVE},
-        "uart_component_rp2040.cpp": {PlatformFramework.RP2040_ARDUINO},
-        "uart_component_libretiny.cpp": {
-            PlatformFramework.BK72XX_ARDUINO,
-            PlatformFramework.RTL87XX_ARDUINO,
-            PlatformFramework.LN882X_ARDUINO,
-        },
-    }
-)
+try:
+    from esphome.const import PlatformFramework
+
+    FILTER_SOURCE_FILES = filter_source_files_from_platform(
+        {
+            "uart_component_esp_idf.cpp": {
+                PlatformFramework.ESP32_IDF,
+                PlatformFramework.ESP32_ARDUINO,
+            },
+            "uart_component_esp8266.cpp": {PlatformFramework.ESP8266_ARDUINO},
+            "uart_component_host.cpp": {PlatformFramework.HOST_NATIVE},
+            "uart_component_rp2040.cpp": {PlatformFramework.RP2040_ARDUINO},
+            "uart_component_libretiny.cpp": {
+                PlatformFramework.BK72XX_ARDUINO,
+                PlatformFramework.RTL87XX_ARDUINO,
+                PlatformFramework.LN882X_ARDUINO,
+            },
+        }
+    )
+except Exception:  # pragma: no cover - older ESPHome without PlatformFramework
+    FILTER_SOURCE_FILES = lambda: []
