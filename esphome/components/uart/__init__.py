@@ -2,7 +2,37 @@ import re
 
 from esphome import automation, pins
 import esphome.codegen as cg
-from esphome.config_helpers import filter_source_files_from_platform
+try:
+    from esphome.config_helpers import filter_source_files_from_platform
+except Exception:  # pragma: no cover - fallback for older ESPHome builds
+    from esphome.const import KEY_CORE, KEY_TARGET_FRAMEWORK, KEY_TARGET_PLATFORM
+
+    _PLATFORM_FRAMEWORK_LOOKUP = {
+        (pf.value[0].value, pf.value[1].value): pf for pf in PlatformFramework
+    }
+
+    def filter_source_files_from_platform(files_map):
+        def filter_source_files():
+            core_data = CORE.data.get(KEY_CORE, {})
+            target_platform = core_data.get(KEY_TARGET_PLATFORM)
+            target_framework = core_data.get(KEY_TARGET_FRAMEWORK)
+
+            if not target_platform or not target_framework:
+                return []
+
+            current_platform_framework = _PLATFORM_FRAMEWORK_LOOKUP.get(
+                (target_platform, target_framework)
+            )
+            if not current_platform_framework:
+                return []
+
+            return [
+                filename
+                for filename, platforms in files_map.items()
+                if current_platform_framework not in platforms
+            ]
+
+        return filter_source_files
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_AFTER,
